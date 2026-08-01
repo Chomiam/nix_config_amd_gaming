@@ -210,6 +210,8 @@
       # 🎮 Gaming & Multimédia
       lutris # Gestionnaire universel de jeux (GOG, Epic, Humble, emulators, etc.)
       heroic # Lanceur alternatif open-source pour Epic Games, GOG et Amazon Prime Games
+      # ryubing # Emulateur de jeux nintendo Switch fork communautaire de Ryujinx
+      eden # Emulateur de jeux nintendo Switch axé sur les hacks mod haute perf - stable
       ludusavi # Outil de sauvegarde automatique des sauvegardes (savegames) de jeux PC
       protonplus # Interface graphique pour télécharger/gérer GE-Proton, Wine-GE et DXVK facilement
       protontricks # Utilitaire pour installer des dépendances Windows dans les préfixes Proton
@@ -352,6 +354,7 @@
     curl # Outil de transfert de données et de requêtes réseau en ligne de commande
     wget # Outil de téléchargement de fichiers depuis le Web
     libva-utils # Fournit la commande 'vainfo' pour vérifier l'encodage matériel
+    libxcb # GUI support pour les AppImages/Tkinter (X11 bindings)
 
     # --- Outils ALSA (CLI) ---
     alsa-utils # Fournit alsamixer, aplay, amixer, alsactl (indispensables)
