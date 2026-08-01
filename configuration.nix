@@ -13,6 +13,7 @@
     ./hardware-configuration.nix
     ./stylix.nix
     ./desktop.nix # Gestionnaire centralisé d'environnement de bureau
+    ./mount.nix # Configuration du montage du disque de jeux
   ];
 
   # =======================================================================
