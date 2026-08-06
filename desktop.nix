@@ -145,11 +145,12 @@
   #   wofi
   #   dunst
   #   kitty
-  #   hyprpaper # <-- Assure-toi que hyprpaper est bien installé ici
+  #   hyprpaper
   #   pavucontrol
   #   grim
   #   slurp
   #   wl-clipboard
+
   # ];
 
   # home-manager.users."chomiam" = {

@@ -19,7 +19,7 @@
         "org.gnome.Nautilus.desktop"
         "io.github.kolunmi.Bazaar.desktop"
         "google-chrome.desktop"
-        "dev.vencord.Vesktop.desktop"
+        "discord.desktop"
         "steam.desktop"
         "net.lutris.Lutris.desktop"
         "com.heroicgameslauncher.hgl.desktop"

@@ -25,10 +25,10 @@
       targets.gnome.enable = true;
 
       # Image de fond d'écran
-      image = pkgs.fetchurl {
-        url = "https://raw.githubusercontent.com/dracula/wallpaper/master/first-collection/nixos.png";
-        sha256 = "0q9wd4g7fyzy38dkmknkz2p58xxh03yk916zdyqhlj0qagxnr444";
-      };
+      # image = pkgs.fetchurl {
+      #   url = "https://raw.githubusercontent.com/dracula/wallpaper/master/first-collection/nixos.png";
+      #   sha256 = "0q9wd4g7fyzy38dkmknkz2p58xxh03yk916zdyqhlj0qagxnr444";
+      # };
 
       # Schéma de couleurs Dracula
       base16Scheme = "${pkgs.base16-schemes}/share/themes/dracula.yaml";

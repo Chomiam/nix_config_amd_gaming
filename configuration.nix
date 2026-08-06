@@ -210,6 +210,8 @@
       # 🎮 Gaming & Multimédia
       lutris # Gestionnaire universel de jeux (GOG, Epic, Humble, emulators, etc.)
       heroic # Lanceur alternatif open-source pour Epic Games, GOG et Amazon Prime Games
+      # pegasus-frontend # Frontend de gestionnaire de jeux pour Linux
+      # retroarch # Emulateur de jeux pour Linux
       # ryubing # Emulateur de jeux nintendo Switch fork communautaire de Ryujinx
       eden # Emulateur de jeux nintendo Switch axé sur les hacks mod haute perf - stable
       ludusavi # Outil de sauvegarde automatique des sauvegardes (savegames) de jeux PC
@@ -220,10 +222,14 @@
       stremio-linux-shell # Interface Shell/Linux pour le lecteur multimédia et de streaming Stremio
       kodi # Centre multimédia complet pour la gestion de vos médias
       vlc # Lecteur média universel et léger pour tous formats
+      easyeffects # Effets audio pour les applications Linux
 
       # 💼 Productivité & Bureautique
       google-chrome # Navigateur web Google Chrome
+      discord # Client de messagerie et de communication en temps réel
       onlyoffice-desktopeditors # Suite bureautique complète (compatible MS Office : Word, Excel, PowerPoint)
+      davinci-resolve # Logiciel de montage vidéo professionnel
+      godot # Éditeur de jeux 2D/3D
       thunderbird # Client de messagerie électronique, calendrier et gestionnaire de contacts
       popsicle # Outil simple d'écriture d'images ISO sur plusieurs clés USB en parallèle
       bazaar # Boutique/catalogue d'applications alternatives pour Linux
@@ -244,7 +250,6 @@
 
       # 🌐 Réseau et Pare-feu
       tailscale # VPN mesh sécurisé basé sur WireGuard
-      opensnitch-ui # Interface graphique pour le démon OpenSnitch
 
     ];
   };
@@ -257,6 +262,13 @@
   # =======================================================================
   # 🎮 PERFORMANCES GAMING & GRAPHISMES
   # =======================================================================
+  environment.variables = {
+    # Active l'implémentation OpenCL moderne basée sur Rust ("Rusticl")
+    # spécifiquement pour le pilote d'affichage AMD Radeon ("radeonsi").
+    # Indispensable pour que DaVinci Resolve utilise l'accélération GPU AMD sur Linux.
+    RUSTICL_ENABLE = "radeonsi";
+  };
+  hardware.amdgpu.opencl.enable = true;
   # Configuration des pilotes et de l'accélération graphique
   hardware.graphics = {
     enable = true; # Active le support de l'accélération graphique (Mesa / Vulkan)
@@ -264,6 +276,8 @@
     extraPackages = with pkgs; [
       vkbasalt # Injecte la couche Vulkan vkBasalt pour le post-traitement (filtres visuels / ReShade)
       libva # Support de l'accélération matérielle (décodage/encodage vidéo VA-API)
+      mesa.opencl # Fournit le runtime OpenCL (via Rusticl/Mesa) permettant aux logiciels de calcul
+      # comme DaVinci Resolve d'exploiter le processeur graphique (GPU)
     ];
   };
 
@@ -360,6 +374,7 @@
     alsa-utils # Fournit alsamixer, aplay, amixer, alsactl (indispensables)
     alsa-tools # Outils avancés pour certaines cartes (hda-jack-retask, etc.)
     alsa-firmware
+    alsa-lib # Bibliothèque ALSA (indispensable pour les applications audio)
 
   ];
 
@@ -367,7 +382,16 @@
   # 🐳 SERVICES & CONTENEURS
   # =======================================================================
   # Support AppImage
-  programs.fuse.userAllowOther = true;
+  programs.appimage.enable = true;
+  programs.appimage.binfmt = true;
+  programs.appimage.package = pkgs.appimage-run.override {
+    extraPkgs = pkgs: [
+      pkgs.icu
+      pkgs.libxcrypt-legacy
+      pkgs.python312
+      pkgs.python312Packages.torch
+    ];
+  };
 
   # Couche de compatibilité nix-ld
   # Permet d'exécuter directement des binaires Linux pré-compilés non prévus pour NixOS
@@ -405,9 +429,6 @@
     ];
   };
 
-  # Active le démon de filtrage OpenSnitch
-  services.opensnitch.enable = true;
-
   # Flatpak
   services.flatpak = {
     enable = true;
@@ -416,7 +437,7 @@
     packages = [
       "org.signal.Signal"
       "com.github.tchx84.Flatseal"
-      "dev.vencord.Vesktop"
+      # "dev.vencord.Vesktop"
       "rocks.shy.VacuumTube"
       "it.mijorus.gearlever"
     ];
