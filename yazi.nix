@@ -7,10 +7,8 @@
   programs.yazi = {
     enable = true;
 
-    # Active l'intégration dans les shells (fournit la commande `y` qui change
-    # automatiquement le répertoire du terminal lors de la fermeture)
+    # Génère le wrapper Fish pour que 'y' change le $PWD du terminal
     enableFishIntegration = true;
-    enableBashIntegration = true;
 
     # -----------------------------------------------------------------------
     # CONFIGURATION PRINCIPALE (yazi.toml)
@@ -30,7 +28,7 @@
         max_height = 1000;
       };
 
-      # Ouvreurs par défaut (définit Neovim pour l'édition de fichiers texte)
+      # Configuration de Neovim comme éditeur texte par défaut
       opener = {
         edit = [
           { run = ''nvim "$@"''; block = true; for = "unix"; }

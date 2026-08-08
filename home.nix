@@ -7,6 +7,14 @@
 
 {
   # =========================================================================
+  # 📦 IMPORTS DES MODULES
+  # =========================================================================
+  imports = [
+    ./yazi.nix
+    ./rmpc.nix
+  ];
+
+  # =========================================================================
   # 👤 UTILISATEUR & SYSTÈME
   # =========================================================================
   home.username = "chomiam";
@@ -49,34 +57,6 @@
       enable_audio_bell = false;
       window_padding_width = 8;
     };
-  };
-
-  # =========================================================================
-  # 🚪 MENU DE DÉCONNEXION (WLOGOUT)
-  # =========================================================================
-  programs.wlogout = {
-    enable = true;
-
-    layout = [
-      {
-        label = "lock";
-        action = "hyprlock";
-        text = "󰌾  Déconnecter";
-        keybind = "l";
-      }
-      {
-        label = "reboot";
-        action = "systemctl reboot";
-        text = "󰜉  Redémarrer";
-        keybind = "r";
-      }
-      {
-        label = "shutdown";
-        action = "systemctl poweroff";
-        text = "󰐥  Éteindre";
-        keybind = "s";
-      }
-    ];
   };
 
   # =========================================================================
@@ -124,6 +104,103 @@
       ];
     };
   };
+
+# =========================================================================
+  # 🚪 MENU DE DÉCONNEXION (WLOGOUT - CATPPUCCIN MACCHIATO)
+  # =========================================================================
+  programs.wlogout = {
+    enable = true;
+
+    layout = [
+      {
+        label = "logout";
+        action = "loginctl terminate-user $USER";
+        text = "Déconnecter";
+        keybind = "d";
+      }
+      {
+        label = "reboot";
+        action = "systemctl reboot";
+        text = "Redémarrer";
+        keybind = "r";
+      }
+      {
+        label = "shutdown";
+        action = "systemctl poweroff";
+        text = "Éteindre";
+        keybind = "e";
+      }
+    ];
+
+    style = let
+      logoutIcon = pkgs.fetchurl {
+        url = "https://raw.githubusercontent.com/catppuccin/wlogout/main/icons/wlogout/macchiato/lavender/logout.svg";
+        sha256 = "sha256-7Cs2Fg6PZuv0dKPks7WoOQVm177qhwnQbWO7wovde+o=";
+      };
+      rebootIcon = pkgs.fetchurl {
+        url = "https://raw.githubusercontent.com/catppuccin/wlogout/main/icons/wlogout/macchiato/lavender/reboot.svg";
+        sha256 = "sha256-/n07kWDpmGZRewuZqbkwKNfBQvjzDPTI9d40VGb7CT8=";
+      };
+      shutdownIcon = pkgs.fetchurl {
+        url = "https://raw.githubusercontent.com/catppuccin/wlogout/main/icons/wlogout/macchiato/lavender/shutdown.svg";
+        sha256 = "sha256-7NAaVOdBW8hWa6+UE5sfEINM2Efpy9YcxQ44G96UisU=";
+      };
+    in ''
+      * {
+        box-shadow: none;
+        font-family: "JetBrainsMono Nerd Font", monospace;
+      }
+
+      window {
+        background-color: rgba(36, 39, 58, 0.85);
+      }
+
+      button {
+        border-radius: 16px;
+        border: 2px solid #363a4f;
+        color: #cad3f5;
+        background-color: #1e2030;
+        margin: 15px;
+        font-size: 16px;
+        background-repeat: no-repeat;
+        background-position: center 30%;
+        background-size: 25%;
+        transition: all 0.2s ease-in-out;
+      }
+
+      button:focus, button:active, button:hover {
+        background-color: #363a4f;
+      }
+
+      #logout {
+        background-image: image(url("${logoutIcon}"));
+      }
+
+      #reboot {
+        background-image: image(url("${rebootIcon}"));
+      }
+
+      #shutdown {
+        background-image: image(url("${shutdownIcon}"));
+      }
+
+      #logout:hover {
+        border-color: #8aadf4;
+        color: #8aadf4;
+      }
+
+      #reboot:hover {
+        border-color: #f5a97f;
+        color: #f5a97f;
+      }
+
+      #shutdown:hover {
+        border-color: #ed8796;
+        color: #ed8796;
+      }
+    '';
+  };
+
 
   # =========================================================================
   # 🚀 LANCEUR D'APPLICATIONS (WOFI - CATPPUCCIN MOCHA)
@@ -260,7 +337,7 @@
         "custom/power" = {
           format = "⏻";
           tooltip = false;
-          on-click = "wlogout";
+          on-click = "wlogout -b 3 --protocol layer-shell";
         };
       };
     };
@@ -369,6 +446,7 @@
   # 🌐 VARIABLES D'ENVIRONNEMENT
   # =========================================================================
   home.sessionVariables = {
+    "TERMINAL" = "kitty"; # Indique à Wofi et XDG d'utiliser Kitty pour les apps TUI
     "KWIN_DRM_USE_MODIFIER" = "0";
     "MUTTER_DEBUG_FORCE_KMS_MODE" = "simple";
   };
