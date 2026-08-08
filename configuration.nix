@@ -11,9 +11,10 @@
   # =======================================================================
   imports = [
     ./hardware-configuration.nix
-    ./stylix.nix
+#    ./stylix.nix
     ./desktop.nix # Gestionnaire centralisé d'environnement de bureau
     ./mount.nix # Configuration du montage du disque de jeux
+    ./neovim.nix
   ];
 
   # =======================================================================
@@ -223,7 +224,8 @@
       kodi # Centre multimédia complet pour la gestion de vos médias
       vlc # Lecteur média universel et léger pour tous formats
       easyeffects # Effets audio pour les applications Linux
-
+      mpv      
+      
       # 💼 Productivité & Bureautique
       google-chrome # Navigateur web Google Chrome
       discord # Client de messagerie et de communication en temps réel
@@ -359,6 +361,11 @@
     p7zip # Utilitaire pour la gestion des fichiers compressés .7z
     unrar # Utilitaire pour l'extraction des fichiers compressés .rar
     unzip # Utilitaire pour la décompression des fichiers .zip
+    
+    # Polices d'ecritre
+    font-awesome
+    font-awesome_4
+    noto-fonts
 
     # 🛠️ Outils Système
     nh # ⚠️ Outil issu d'un Flake communautaire (Requiert une config NixOS basée sur les Flakes)
@@ -369,7 +376,7 @@
     wget # Outil de téléchargement de fichiers depuis le Web
     libva-utils # Fournit la commande 'vainfo' pour vérifier l'encodage matériel
     libxcb # GUI support pour les AppImages/Tkinter (X11 bindings)
-
+    killall 
     # --- Outils ALSA (CLI) ---
     alsa-utils # Fournit alsamixer, aplay, amixer, alsactl (indispensables)
     alsa-tools # Outils avancés pour certaines cartes (hda-jack-retask, etc.)
