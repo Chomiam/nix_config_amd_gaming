@@ -15,6 +15,7 @@
     ./desktop.nix # Gestionnaire centralisé d'environnement de bureau
     ./mount.nix # Configuration du montage du disque de jeux
     ./neovim.nix
+    ./yazi.nix
   ];
 
   # =======================================================================
@@ -224,7 +225,7 @@
       kodi # Centre multimédia complet pour la gestion de vos médias
       vlc # Lecteur média universel et léger pour tous formats
       easyeffects # Effets audio pour les applications Linux
-      mpv      
+      mpv # Moteur de rendu mpv       
       
       # 💼 Productivité & Bureautique
       google-chrome # Navigateur web Google Chrome

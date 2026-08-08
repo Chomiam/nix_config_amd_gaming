@@ -16,7 +16,7 @@
   programs.home-manager.enable = true;
 
   # =========================================================================
-  # 📦 PAQUETS UTILISATEUR
+  # 📦 PAQUETS UTILISATEUR & POLICES
   # =========================================================================
   home.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
@@ -34,7 +34,24 @@
     x11.enable = true;
   };
 
-# =========================================================================
+  # =========================================================================
+  # 💻 TERMINAL (KITTY - CATPPUCCIN MOCHA)
+  # =========================================================================
+  programs.kitty = {
+    enable = true;
+    themeFile = "Catppuccin-Mocha";
+
+    settings = {
+      font_family = "JetBrainsMono Nerd Font";
+      font_size = 11;
+      background_opacity = "0.90";
+      confirm_os_window_close = 0;
+      enable_audio_bell = false;
+      window_padding_width = 8;
+    };
+  };
+
+  # =========================================================================
   # 🚪 MENU DE DÉCONNEXION (WLOGOUT)
   # =========================================================================
   programs.wlogout = {
@@ -60,17 +77,10 @@
         keybind = "s";
       }
     ];
-};
-
-
-
-
-
-
-
+  };
 
   # =========================================================================
-  # 🔐 VERROUILLAGE D'ÉCRAN (HYPRLOCK)
+  # 🔐 VERROUILLAGE D'ÉCRAN (HYPRLOCK - CATPPUCCIN MOCHA)
   # =========================================================================
   programs.hyprlock = {
     enable = true;
@@ -90,9 +100,9 @@
           monitor = "";
           size = "250, 50";
           outline_thickness = 3;
-          outer_color = "rgba(122, 162, 247, 1.0)";
-          inner_color = "rgba(26, 27, 38, 0.8)";
-          font_color = "rgba(192, 202, 245, 1.0)";
+          outer_color = "rgba(137, 180, 250, 1.0)"; # Blue (Catppuccin)
+          inner_color = "rgba(30, 30, 46, 0.85)";  # Base (Catppuccin)
+          font_color = "rgba(205, 214, 244, 1.0)";  # Text (Catppuccin)
           placeholder_text = "Mot de passe...";
           position = "0, -20";
           halign = "center";
@@ -104,7 +114,7 @@
         {
           monitor = "";
           text = "$TIME";
-          color = "rgba(192, 202, 245, 1.0)";
+          color = "rgba(205, 214, 244, 1.0)";
           font_size = 64;
           font_family = "JetBrainsMono Nerd Font";
           position = "0, 80";
@@ -116,7 +126,7 @@
   };
 
   # =========================================================================
-  # 🚀 LANCEUR D'APPLICATIONS (WOFI)
+  # 🚀 LANCEUR D'APPLICATIONS (WOFI - CATPPUCCIN MOCHA)
   # =========================================================================
   programs.wofi = {
     enable = true;
@@ -136,8 +146,8 @@
     style = ''
       window {
         margin: 0px;
-        background-color: rgba(26, 27, 38, 0.95);
-        border: 2px solid #7aa2f7;
+        background-color: rgba(30, 30, 46, 0.95);
+        border: 2px solid #89b4fa;
         border-radius: 12px;
         font-family: "JetBrainsMono Nerd Font", monospace;
         font-size: 14px;
@@ -148,8 +158,8 @@
         padding: 8px 12px;
         border: none;
         border-radius: 8px;
-        color: #c0caf5;
-        background-color: #24283b;
+        color: #cdd6f4;
+        background-color: #313244;
       }
 
       #inner-box {
@@ -172,16 +182,16 @@
       #text {
         margin: 5px;
         border: none;
-        color: #c0caf5;
+        color: #cdd6f4;
       }
 
       #entry:selected {
-        background-color: #7aa2f7;
+        background-color: #89b4fa;
         border-radius: 8px;
       }
 
       #entry:selected #text {
-        color: #15161e;
+        color: #11111b;
         font-weight: bold;
       }
 
@@ -193,7 +203,7 @@
   };
 
   # =========================================================================
-  # 📊 BARRE D'ÉTAT (WAYBAR)
+  # 📊 BARRE D'ÉTAT (WAYBAR - CATPPUCCIN MOCHA)
   # =========================================================================
   programs.waybar = {
     enable = true;
@@ -247,7 +257,6 @@
           spacing = 10;
         };
 
-        # --- Bouton d'alimentation ---
         "custom/power" = {
           format = "⏻";
           tooltip = false;
@@ -266,53 +275,53 @@
       }
 
       window#waybar {
-        background-color: rgba(26, 27, 38, 0.85);
-        color: #c0caf5;
+        background-color: rgba(30, 30, 46, 0.85);
+        color: #cdd6f4;
       }
 
       #workspaces button {
         padding: 0 8px;
         background-color: transparent;
-        color: #a9b1d6;
+        color: #a6adc8;
       }
 
       #workspaces button.active {
-        background-color: #7aa2f7;
-        color: #15161e;
+        background-color: #89b4fa;
+        color: #11111b;
         border-radius: 4px;
       }
 
       #clock, #cpu, #memory, #network, #pulseaudio, #tray {
         padding: 0 10px;
         margin: 3px 2px;
-        background-color: #24283b;
+        background-color: #313244;
         border-radius: 4px;
       }
 
       #custom-power {
         padding: 0 10px;
         margin: 3px 2px;
-        background-color: #f7768e;
-        color: #15161e;
+        background-color: #f38ba8;
+        color: #11111b;
         border-radius: 4px;
         font-weight: bold;
       }
 
       #clock {
-        color: #7dcfff;
+        color: #89dceb;
         font-weight: bold;
       }
 
       #pulseaudio {
-        color: #f7768e;
+        color: #f38ba8;
       }
 
       #network {
-        color: #73daca;
+        color: #a6e3a1;
       }
 
       #cpu, #memory {
-        color: #e0af68;
+        color: #f9e2af;
       }
     '';
   };
