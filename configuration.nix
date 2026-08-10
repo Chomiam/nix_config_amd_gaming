@@ -221,7 +221,7 @@
       vlc # Lecteur média universel et léger pour tous formats
       easyeffects # Effets audio pour les applications Linux
       mpv # Moteur de rendu multimédia
-      inputs.yt-x.packages.${pkgs.system}.default
+      inputs.yt-x.packages.${pkgs.stdenv.hostPlatform.system}.default
 
       # 💼 Productivité & Bureautique
       google-chrome # Navigateur web Google Chrome

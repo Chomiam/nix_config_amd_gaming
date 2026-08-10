@@ -34,6 +34,7 @@
     alacritty.enable = true;
     swaync.enable = false;
     waybar.enable = false;
+    gemini-cli.enable = false;
   };
 
   # =========================================================================
