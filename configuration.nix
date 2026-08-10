@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }:
 
@@ -11,7 +12,7 @@
   # =======================================================================
   imports = [
     ./hardware-configuration.nix
-#    ./stylix.nix
+    # ./stylix.nix
     ./desktop.nix # Gestionnaire centralisé d'environnement de bureau
     ./mount.nix # Configuration du montage du disque de jeux
     ./neovim.nix
@@ -33,12 +34,10 @@
     # Active l'optimisation et le dédoublonnage automatique du magasin /nix/store
     # Réduit l'espace disque utilisé en créant des liens physiques (hardlinks) entre les fichiers identiques
     auto-optimise-store = true;
-
   };
 
   # Jeton d'accès personnel GitHub (PAT)
   # Augmente le quota de requêtes (rate-limit) auprès de l'API GitHub pour éviter les blocages lors du téléchargement des Flakes
-  #
   # 🔒 Inclusion sécurisée du token GitHub depuis un fichier externe non versionné
   nix.extraOptions = ''
     !include /etc/nixos/secrets/github-token.conf
@@ -146,7 +145,7 @@
     };
 
     # Serveurs DNS manuels (Cloudflare et Quad9)
-    # Remplacent le DNS par défaut de ton fournisseur d'accès pour plus de rapidité/confidentialité
+    # Remplacent le DNS par défaut du FAI pour plus de rapidité/confidentialité
     nameservers = [
       "1.1.1.1"
       "9.9.9.9"
@@ -179,7 +178,7 @@
   };
 
   # =======================================================================
-  # 🔊 AUDIO & IMPRESSION
+  # 🔊 AUDIO, IMPRESSION & SERVICES EFFECT
   # =======================================================================
   services.printing.enable = true;
 
@@ -211,10 +210,7 @@
       # 🎮 Gaming & Multimédia
       lutris # Gestionnaire universel de jeux (GOG, Epic, Humble, emulators, etc.)
       heroic # Lanceur alternatif open-source pour Epic Games, GOG et Amazon Prime Games
-      # pegasus-frontend # Frontend de gestionnaire de jeux pour Linux
-      # retroarch # Emulateur de jeux pour Linux
-      # ryubing # Emulateur de jeux nintendo Switch fork communautaire de Ryujinx
-      eden # Emulateur de jeux nintendo Switch axé sur les hacks mod haute perf - stable
+      eden # Émulateur Nintendo Switch axé sur les hacks mod haute performance
       ludusavi # Outil de sauvegarde automatique des sauvegardes (savegames) de jeux PC
       protonplus # Interface graphique pour télécharger/gérer GE-Proton, Wine-GE et DXVK facilement
       protontricks # Utilitaire pour installer des dépendances Windows dans les préfixes Proton
@@ -224,35 +220,35 @@
       kodi # Centre multimédia complet pour la gestion de vos médias
       vlc # Lecteur média universel et léger pour tous formats
       easyeffects # Effets audio pour les applications Linux
-      mpv # Moteur de rendu mpv       
-      
+      mpv # Moteur de rendu multimédia
+      inputs.yt-x.packages.${pkgs.system}.default
+
       # 💼 Productivité & Bureautique
       google-chrome # Navigateur web Google Chrome
       discord # Client de messagerie et de communication en temps réel
-      onlyoffice-desktopeditors # Suite bureautique complète (compatible MS Office : Word, Excel, PowerPoint)
+      onlyoffice-desktopeditors # Suite bureautique complète (compatible MS Office)
       davinci-resolve # Logiciel de montage vidéo professionnel
       godot # Éditeur de jeux 2D/3D
       thunderbird # Client de messagerie électronique, calendrier et gestionnaire de contacts
       popsicle # Outil simple d'écriture d'images ISO sur plusieurs clés USB en parallèle
       bazaar # Boutique/catalogue d'applications alternatives pour Linux
       zed-editor # Éditeur de code ultra-rapide et moderne écrit en Rust
-      nil # Language Server (LSP) pour le langage Nix (autocomplétion, diagnostic dans Zed/VSCode)
+      nil # Language Server (LSP) pour le langage Nix
 
       # 🛠️ Outils CLI & Shell
       fzf # Outil de recherche floue (fuzzy finder) ultra-rapide dans le terminal
-      grc # Generic Colouriser : ajoute de la couleur aux sorties de commandes (ping, netstat, etc.)
-      btop # Moniteur de ressources système interactif et stylé (CPU, RAM, Disque, Réseau)
-      fastfetch # Outil d'affichage des informations système ultra-rapide (alternative moderne à neofetch)
-      git # Système de contrôle de version pour la gestion de code et de configurations
+      grc # Generic Colouriser : ajoute de la couleur aux sorties de commandes
+      btop # Moniteur de ressources système interactif (CPU, RAM, Disque, Réseau)
+      fastfetch # Outil d'affichage des informations système ultra-rapide
+      git # Système de contrôle de version pour la gestion de code
       fishPlugins.done # Plugin Fish : envoie une notification quand une commande longue est terminée
-      fishPlugins.fzf-fish # Plugin Fish : intègre les raccourcis de recherche FZF directement dans le shell
-      fishPlugins.forgit # Plugin Fish : intègre FZF avec Git pour visualiser les diffs/commits de manière interactive
-      fishPlugins.hydro # Plugin Fish : prompt minimaliste, rapide et d'apparence moderne
+      fishPlugins.fzf-fish # Plugin Fish : intègre les raccourcis de recherche FZF
+      fishPlugins.forgit # Plugin Fish : intègre FZF avec Git de manière interactive
+      fishPlugins.hydro # Plugin Fish : prompt minimaliste et moderne
       fishPlugins.grc # Plugin Fish : coloration automatique des commandes via GRC
 
       # 🌐 Réseau et Pare-feu
       tailscale # VPN mesh sécurisé basé sur WireGuard
-
     ];
   };
 
@@ -271,36 +267,35 @@
     RUSTICL_ENABLE = "radeonsi";
   };
   hardware.amdgpu.opencl.enable = true;
+
   # Configuration des pilotes et de l'accélération graphique
   hardware.graphics = {
     enable = true; # Active le support de l'accélération graphique (Mesa / Vulkan)
-    enable32Bit = true; # Active les pilotes 32-bit (Indispensable pour faire tourner les jeux Windows 32-bit via Wine/Proton)
+    enable32Bit = true; # Active les pilotes 32-bit (Indispensable pour jeux Windows 32-bit via Wine/Proton)
     extraPackages = with pkgs; [
       vkbasalt # Injecte la couche Vulkan vkBasalt pour le post-traitement (filtres visuels / ReShade)
       libva # Support de l'accélération matérielle (décodage/encodage vidéo VA-API)
-      mesa.opencl # Fournit le runtime OpenCL (via Rusticl/Mesa) permettant aux logiciels de calcul
-      # comme DaVinci Resolve d'exploiter le processeur graphique (GPU)
+      mesa.opencl # Fournit le runtime OpenCL (via Rusticl/Mesa) pour DaVinci Resolve
     ];
   };
 
   # Active les règles udev et le support matériel pour le matériel Steam
-  # (Manettes Steam Controller, HTC Vive / Casques VR, et règles pour manettes Xbox/PlayStation)
   hardware.steam-hardware.enable = true;
 
   # Configuration de la plateforme Steam
   programs.steam = {
     enable = true;
-    remotePlay.openFirewall = true; # Ouvre automatiquement les ports du pare-feu pour le streaming Steam Remote Play
-    dedicatedServer.openFirewall = true; # Ouvre les ports réseau nécessaires si tu héberges des serveurs de jeu dédiés
-    gamescopeSession.enable = true; # Ajoute l'option de lancer une session Steam en mode "Big Picture" gérée par Gamescope (style SteamDeck)
+    remotePlay.openFirewall = true; # Ouvre automatiquement les ports du pare-feu pour Steam Remote Play
+    dedicatedServer.openFirewall = true; # Ouvre les ports réseau pour l'hébergement de serveurs dédiés
+    gamescopeSession.enable = true; # Session Steam en mode "Big Picture" gérée par Gamescope
   };
 
-  # Daemon d'optimisation des performances en jeu (GameMode de Feral Interactive)
+  # Démon d'optimisation des performances en jeu (GameMode)
   programs.gamemode = {
     enable = true;
-    enableRenice = true; # Autorise GameMode à modifier la priorité CPU (nice) des processus de jeu
+    enableRenice = true; # Autorise GameMode à modifier la priorité CPU (nice)
     settings.general = {
-      renice = 10; # Augmente la priorité du jeu par rapport aux autres applications d'arrière-plan
+      renice = 10; # Augmente la priorité du jeu par rapport aux applications d'arrière-plan
       enableWsi = true; # Active l'optimisation des couches d'affichage Vulkan (WSI)
     };
   };
@@ -308,10 +303,10 @@
   # Compositeur micro-session dédié au jeu (Gamescope)
   programs.gamescope = {
     enable = true;
-    capSysNice = false; # Désactive l'attribution de la capacité CAP_SYS_NICE via les SUID wrappers (géré plus proprement via Gamemode/renice)
+    capSysNice = false; # Désactive l'attribution de capacité SUID (géré via Gamemode/renice)
   };
 
-  # Daemon de priorités processus CachyOS (Ananicy)
+  # Démon de priorités processus CachyOS (Ananicy)
   services.ananicy = {
     enable = true;
     package = pkgs.ananicy-cpp;
@@ -319,16 +314,12 @@
   };
 
   # Service de démarrage pour l'ordonnanceur personnalisé sched_ext (LAVD)
-  # LAVD (Latency-Critical Architecture-Aware Virtual Deadline) optimise l'ordonnancement CPU
-  # en réduisant la latence et en tirant parti de l'architecture du processeur (idéal pour le gaming).
   systemd.services.scx = {
-    description = "sched_ext LAVD scheduler"; # Description lisible du service dans systemctl
-    wantedBy = [ "multi-user.target" ]; # Lance le service automatiquement au démarrage en mode multi-utilisateur (démarrage normal)
+    description = "sched_ext LAVD scheduler";
+    wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {
-      # Exécute l'ordonnanceur scx_lavd à partir du paquet scx.full
       ExecStart = "${pkgs.scx.full}/bin/scx_lavd";
-      # Redémarre automatiquement le service s'il s'arrête ou plante en cours de route
       Restart = "always";
     };
   };
@@ -340,49 +331,49 @@
     # 🎮 Jeux & Compatibilité Windows
     umu-launcher # Lanceur unifié pour exécuter Proton/Wine sur des jeux non-Steam
     wine64 # Couche de compatibilité pour exécuter des applications Windows (64 bits)
-    winetricks # Assistant pour installer des DLL et composants Windows manquants dans Wine
-    protontricks # Assistant pour gérer les composants et réglages dans les préfixes Proton
-    steam-run # Exécute des binaires Linux standards non prévus pour l'environnement NixOS
+    winetricks # Assistant pour installer des DLL et composants Windows manquants
+    protontricks # Assistant pour gérer les composants dans les préfixes Proton
+    steam-run # Exécute des binaires Linux standards non prévus pour NixOS
     vkbasalt # Couche de post-traitement Vulkan (filtres visuels/ReShade en jeu)
-    low-latency-layer # ⚠️ Provenant du Flake/module Chaotic-Nyx (Couche Vulkan pour réduire la latence)
-    innoextract # Extrait le contenu des installeurs Windows Inno Setup (jeux GOG, etc.)
+    low-latency-layer # Couche Vulkan pour réduire la latence
+    innoextract # Extrait le contenu des installeurs Windows Inno Setup
 
     # 🖥️ Interface & Rendu
     adw-gtk3 # Thème pour uniformiser le style des anciennes apps GTK3 avec Libadwaita
-    libadwaita # Bibliothèque de composants graphiques pour les applications GNOME modernes
-    libdisplay-info_0_2 # Bibliothèque bas niveau pour la lecture des informations écran (EDID)
-    libappindicator-gtk3 # Requis pour les icônes de la zone de notification (systray) des AppImages/apps (ex: Harbor, Discord)
-    svp # Application et plugin de fluidification vidéo en temps réel (interpolation de FPS vers 60/144Hz)
+    libadwaita # Composants graphiques pour applications GNOME modernes
+    libdisplay-info_0_2 # Lecture des informations écran (EDID)
+    libappindicator-gtk3 # Icônes de zone de notification (systray) pour AppImages
+    svp # Interpolation vidéo en temps réel vers 60/144Hz
 
     # 📦 Compression & Archives
-    atool # Interface en ligne de commande universelle pour gérer tout type d'archive
+    atool # Interface universelle pour gérer tout type d'archive
     gnutar # Outil d'archivage standard (commande tar)
-    libarchive # Bibliothèque multi-format d'extraction/compression (fournit bsdtar)
+    libarchive # Bibliothèque multi-format d'extraction/compression (bsdtar)
     p7zip # Utilitaire pour la gestion des fichiers compressés .7z
-    unrar # Utilitaire pour l'extraction des fichiers compressés .rar
-    unzip # Utilitaire pour la décompression des fichiers .zip
-    
-    # Polices d'ecritre
+    unrar # Extrait les fichiers compressés .rar
+    unzip # Décompresse les fichiers .zip
+
+    # 🔤 Polices d'écriture
     font-awesome
     font-awesome_4
     noto-fonts
 
     # 🛠️ Outils Système
-    nh # ⚠️ Outil issu d'un Flake communautaire (Requiert une config NixOS basée sur les Flakes)
-    scx.full # Suite d'ordonnanceurs CPU sched_ext (comprend notamment scx_lavd)
-    fuse3 # Système de fichiers FUSE v3 (indispensable pour l'exécution des AppImages)
-    python3 # Interpréteur Python 3 (dépendance requise pour de nombreux scripts)
-    curl # Outil de transfert de données et de requêtes réseau en ligne de commande
-    wget # Outil de téléchargement de fichiers depuis le Web
-    libva-utils # Fournit la commande 'vainfo' pour vérifier l'encodage matériel
-    libxcb # GUI support pour les AppImages/Tkinter (X11 bindings)
-    killall 
-    # --- Outils ALSA (CLI) ---
-    alsa-utils # Fournit alsamixer, aplay, amixer, alsactl (indispensables)
-    alsa-tools # Outils avancés pour certaines cartes (hda-jack-retask, etc.)
-    alsa-firmware
-    alsa-lib # Bibliothèque ALSA (indispensable pour les applications audio)
+    nh # CLI d'aide pour la gestion des Flakes NixOS
+    scx.full # Ordonnanceurs CPU sched_ext (comprend scx_lavd)
+    fuse3 # Système de fichiers FUSE v3 (indispensable pour les AppImages)
+    python3 # Interpréteur Python 3
+    curl # Transfert de données en ligne de commande
+    wget # Téléchargement de fichiers web
+    libva-utils # Diagnostic d'encodage/décodage matériel (commandes vainfo)
+    libxcb # Support GUI pour AppImages/Tkinter
+    killall # Utilitaire d'arrêt de processus par nom
 
+    # 🔊 Outils ALSA (CLI)
+    alsa-utils # Outils d'administration audio CLI (alsamixer, amixer, etc.)
+    alsa-tools # Outils avancés pour cartes audio matérielles
+    alsa-firmware # Firmwares propriétaires pour puces audio
+    alsa-lib # Bibliothèque C bas niveau pour l'API ALSA
   ];
 
   # =======================================================================
@@ -400,43 +391,35 @@
     ];
   };
 
-  # Couche de compatibilité nix-ld
-  # Permet d'exécuter directement des binaires Linux pré-compilés non prévus pour NixOS
-  # (outils téléchargés hors Nixpkgs, scripts Node/VSCode, exécutables dynamiques) sans erreur d'interpréteur ELF.
+  # Couche de compatibilité nix-ld (Exécution de binaires ELF pré-compilés)
   programs.nix-ld = {
     enable = true;
-    # Bibliothèques système partagées chargées par défaut dans l'environnement nix-ld
     libraries = with pkgs; [
-      stdenv.cc.cc # Bibliothèques d'exécution standard du compilateur C/C++ (libstdc++)
-      zlib # Bibliothèque de compression de données standard
-      icu # Composant de prise en charge d'Unicode et de l'internationalisation
-      nss # Network Security Services (sécurité, certificats SSL/TLS)
-      openssl # Bibliothèque de chiffrement et de communication sécurisée
-      glib # Bibliothèque bas niveau de structures de données pour le C (utilisée par GNOME/GTK)
+      stdenv.cc.cc # Bibliothèques d'exécution standard C/C++
+      zlib # Compression
+      icu # Composants Unicode
+      nss # Certificats et sécurité SSL/TLS
+      openssl # Chiffrement
+      glib # Structures de données C
     ];
   };
 
   # Studio d'enregistrement et de streaming vidéo (OBS Studio)
   programs.obs-studio = {
     enable = true;
-
-    # Surcharge d'OBS pour forcer FFmpeg complet (nécessaire pour l'encodage matériel AV1 / VA-API)
     package = pkgs.obs-studio.override {
       ffmpeg = pkgs.ffmpeg-full;
     };
-
-    # Plugins OBS intégrés déclarativement
     plugins = with pkgs.obs-studio-plugins; [
-      wlrobs # Capture d'écran native optimisée pour Wayland / wlroots
-      obs-backgroundremoval # Filtre de suppression d'arrière-plan sans fond vert (via IA/ML)
-      obs-pipewire-audio-capture # Capture audio applicative ultra-précise basée sur PipeWire
-      obs-gstreamer # Extension du support d'encodage/décodage via les pipelines GStreamer
-      obs-vkcapture # Capture d'écran et de fenêtres de jeu Vulkan/OpenGL à très faible latence
-      # (Note: obs-vaapi a été retiré car obsolète et inutile ; le VA-API AV1/H264 est géré nativement via FFmpeg)
+      wlrobs # Capture Wayland / wlroots
+      obs-backgroundremoval # suppression d'arrière-plan IA
+      obs-pipewire-audio-capture # Capture audio applicative PipeWire
+      obs-gstreamer # Pipelines GStreamer
+      obs-vkcapture # Capture Vulkan/OpenGL à très faible latence
     ];
   };
 
-  # Flatpak
+  # Support Flatpak
   services.flatpak = {
     enable = true;
     update.auto.enable = true;
@@ -444,21 +427,20 @@
     packages = [
       "org.signal.Signal"
       "com.github.tchx84.Flatseal"
-      # "dev.vencord.Vesktop"
       "rocks.shy.VacuumTube"
       "it.mijorus.gearlever"
     ];
   };
 
-  # Virtualisation
+  # Conteneurs & Virtualisation
   virtualisation.docker.enable = true;
   virtualisation.oci-containers.backend = "docker";
 
-  # Services Matériels / Réseau
+  # Services Matériels & Réseau
   services.openssh.enable = true;
-  services.lact.enable = true; # AMD Overclocking / Fan control
+  services.lact.enable = true; # Contrôle ventilateurs et Overclocking GPU AMD
 
-  # Mise à jour système au démarrage (1 min après boot)
+  # Mise à jour système automatique
   system.autoUpgrade = {
     enable = true;
     dates = "daily";

@@ -7,19 +7,51 @@
   programs.yazi = {
     enable = true;
 
-    # Génère le wrapper Fish pour que 'y' change le $PWD du terminal
+    # Intégration du wrapper Fish shell (commande 'y')
     enableFishIntegration = true;
+
+    # Outils CLI d'extraction injectés dans le PATH de Yazi
+    extraPackages = with pkgs; [
+      ouch        # Décompresseur universel
+      p7zip       # Support 7z / zip / rar
+      unar        # Support multi-formats / encodages
+    ];
+
+    # -----------------------------------------------------------------------
+    # PLUGINS
+    # -----------------------------------------------------------------------
+    plugins = {
+      lin-decompress = pkgs.fetchFromGitHub {
+        owner = "ZimCodes";
+        repo = "lin-decompress.yazi";
+        rev = "main";
+        hash = "sha256-25lmX2hHfe8at/3gJ4vB8MiCRE+QR46rt3jCpF/fiX4="; # Hash temporaire
+      };
+    };
+
+    # -----------------------------------------------------------------------
+    # RACCOURCIS CLAVIER (KEYMAP)
+    # -----------------------------------------------------------------------
+    keymap = {
+      manager.prepend_keymap = [
+        {
+          on = [ "e" "x" ];
+          run = "plugin lin-decompress";
+          desc = "Extraire l'archive";
+        }
+      ];
+    };
 
     # -----------------------------------------------------------------------
     # CONFIGURATION PRINCIPALE (yazi.toml)
     # -----------------------------------------------------------------------
     settings = {
       manager = {
-        show_hidden = true;       # Affiche les fichiers cachés par défaut
+        show_hidden = true;       # Affiche les fichiers cachés
         sort_by = "alphabetical"; # Tri alphabétique
-        sort_sensitive = false;  # Insensible à la casse
-        sort_dir_first = true;    # Dossiers placés en haut de liste
-        linemode = "size";        # Affiche la taille des fichiers dans la colonne
+        sort_sensitive = false;   # Insensible à la casse
+        sort_dir_first = true;    # Dossiers en haut
+        linemode = "size";        # Affichage de la taille
       };
 
       preview = {
@@ -28,7 +60,6 @@
         max_height = 1000;
       };
 
-      # Configuration de Neovim comme éditeur texte par défaut
       opener = {
         edit = [
           { run = ''nvim "$@"''; block = true; for = "unix"; }

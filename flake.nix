@@ -2,69 +2,49 @@
   description = "Configuration NixOS avec Flakes, Flatpak, Home Manager et Chaotic-Nyx";
 
   inputs = {
-    # Nixpkgs stable
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
-
-    # Chaotic-Nyx
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-
-    # Module Flatpak
     nix-flatpak.url = "github:gmodena/nix-flatpak";
+    grub2-themes.url = "github:vinceliuice/grub2-themes";
 
-    # Module Home Manager
+    catppuccin = {
+      url = "github:catppuccin/nix/release-26.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Thèmes GRUB2
-    grub2-themes.url = "github:vinceliuice/grub2-themes";
-
-    # Module Stylix (Thématisation)
-    stylix = {
-      url = "github:nix-community/stylix/release-26.05";
+    yt-x = {
+      url = "github:Benexl/yt-x";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      ...
-    }@inputs:
-    let
-      system = "x86_64-linux";
-    in
-    {
-      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-        inherit system;
+  outputs = { self, nixpkgs, ... }@inputs: {
+    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+      # Transmet l'argument 'inputs' à configuration.nix et aux modules système
+      specialArgs = { inherit inputs; };
 
-        modules = [
-          ./configuration.nix
-
-          # Chaotic-Nyx Module
-          inputs.chaotic.nixosModules.default
-
-          # Flatpak
-          inputs.nix-flatpak.nixosModules.nix-flatpak
-
-          # Home Manager
-          inputs.home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              users.chomiam = import ./home.nix;
-            };
-          }
-
-          # GRUB2 Themes
-          inputs.grub2-themes.nixosModules.default
-
-          # Stylix
-          inputs.stylix.nixosModules.stylix
-        ];
-      };
+      modules = [
+        { nixpkgs.hostPlatform = "x86_64-linux"; }
+        ./configuration.nix
+        inputs.chaotic.nixosModules.default
+        inputs.nix-flatpak.nixosModules.nix-flatpak
+        inputs.grub2-themes.nixosModules.default
+        inputs.home-manager.nixosModules.home-manager
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            extraSpecialArgs = { inherit inputs; };
+            sharedModules = [ inputs.catppuccin.homeModules.catppuccin ];
+            users.chomiam = import ./home.nix;
+          };
+        }
+      ];
     };
+  };
 }
