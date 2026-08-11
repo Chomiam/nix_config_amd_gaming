@@ -125,7 +125,6 @@
         "onlyoffice-desktopeditors.desktop"
         "thunderbird.desktop"
         "com.obsproject.Studio.desktop"
-        "zed-editor.desktop"
       ];
     };
 
