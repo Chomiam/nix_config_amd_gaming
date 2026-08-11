@@ -202,6 +202,8 @@
       "networkmanager"
       "wheel"
       "docker"
+      "video"
+      "render" # Accès direct au GPU AMD pour ROCm / Ollama / ComfyUI
     ];
     shell = pkgs.fish;
 
@@ -257,6 +259,46 @@
     interactiveShellInit = "set fish_greeting";
   };
 
+#   # =======================================================================
+#   # 🤖 INTELLIGENCE ARTIFICIELLE & RECHERCHE LOCAL
+#   # =======================================================================
+# :  # Ollama exécuté sur le GPU AMD RX 9070 XT via ROCm (RDNA 4)
+#   services.ollama = {
+#     enable = true;
+#     package = pkgs.ollama-rocm;
+#     rocmOverrideGfx = "12.0.1";
+#     environmentVariables = {
+#       HSA_OVERRIDE_GFX_VERSION = "12.0.1";
+#       # Libère la VRAM instantanément après chaque génération de prompt
+#       OLLAMA_KEEP_ALIVE = "0s";
+#     };
+#   };
+#
+#   # SearXNG : Moteur de recherche privé (Sert d'outil d'accès web à l'agent)
+#   services.searx = {
+#     enable = true;
+#     settings = {
+#       server = {
+#         port = 8888;
+#         bind_address = "127.0.0.1";
+#         secret_key = "secret_key_chomiam_local_ia";
+#       };
+#       search = {
+#         safe_search = 0;
+#         formats = [ "html" "json" ]; # Le format JSON est nécessaire pour l'extraction via Open-WebUI
+#       };
+#     };
+#   };
+#
+#   # Interface Open-WebUI (Agent d'interaction avec le modèle + Web Search)
+#   services.open-webui = {
+#     enable = true;
+#     port = 8080;
+#     environment = {
+#       OLLAMA_BASE_URL = "http://127.0.0.1:11434";
+#     };
+#   };
+
   # =======================================================================
   # 🎮 PERFORMANCES GAMING & GRAPHISMES
   # =======================================================================
@@ -276,6 +318,7 @@
       vkbasalt # Injecte la couche Vulkan vkBasalt pour le post-traitement (filtres visuels / ReShade)
       libva # Support de l'accélération matérielle (décodage/encodage vidéo VA-API)
       mesa.opencl # Fournit le runtime OpenCL (via Rusticl/Mesa) pour DaVinci Resolve
+      rocmPackages.clr # Runtimes ROCm pour le calcul GPU AMD
     ];
   };
 
@@ -332,7 +375,7 @@
     umu-launcher # Lanceur unifié pour exécuter Proton/Wine sur des jeux non-Steam
     wine64 # Couche de compatibilité pour exécuter des applications Windows (64 bits)
     winetricks # Assistant pour installer des DLL et composants Windows manquants
-    protontricks # Assistant pour gérer les composants dans les préfixes Proton
+    protontricks # Assistant pour gérer les composants dans les préprefixes Proton
     steam-run # Exécute des binaires Linux standards non prévus pour NixOS
     vkbasalt # Couche de post-traitement Vulkan (filtres visuels/ReShade en jeu)
     low-latency-layer # Couche Vulkan pour réduire la latence
@@ -432,26 +475,61 @@
     ];
   };
 
-  # Conteneurs & Virtualisation
+# ===========================================================================
+  # 🐳 Virtualisation & Moteur Docker
+  # ===========================================================================
   virtualisation.docker.enable = true;
   virtualisation.oci-containers.backend = "docker";
 
-  # Services Matériels & Réseau
-  services.openssh.enable = true;
-  services.lact.enable = true; # Contrôle ventilateurs et Overclocking GPU AMD
 
-  # Mise à jour système automatique
-  system.autoUpgrade = {
-    enable = true;
-    dates = "daily";
-  };
 
-  systemd.timers."nixos-upgrade" = {
-    timerConfig = {
-      OnBootSec = "1min";
-      OnCalendar = "";
-    };
-  };
+  # ===========================================================================
+  # 🎨 Conteneur ComfyUI (Image Communautaire Stable ROCm)
+  # ===========================================================================
+  # virtualisation.oci-containers.containers.comfyui = {
+  #   # Image communautaire de référence (PyTorch ROCm stable, pas de version Alpha)
+  #   image = "yanwk/comfyui-boot:rocm";
+  #
+  #   # Exposition de l'interface Web
+  #   ports = [ "8188:8188" ];
+  #
+  #   # NOTE : On n'utilise pas 'cmd = [...]' car le point d'entrée de ce conteneur
+  #   # exécute son propre script qui intercepte la variable CLI_ARGS.
+  #   environment = {
+  #     # Drapeaux d'exécution transmis directement au serveur ComfyUI
+  #     CLI_ARGS = "--listen 0.0.0.0 --port 8188 --lowvram";
+  #
+  #     # Anti-fragmentation de la mémoire VRAM par PyTorch
+  #     PYTORCH_CUDA_ALLOC_CONF = "expandable_segments:True";
+  #
+  #     # Identification de l'architecture GPU (RDNA 4 / RX 9070 XT -> GFX 12.0.1)
+  #     HSA_OVERRIDE_GFX_VERSION = "12.0.1";
+  #
+  #     # Prévention des gels système dus aux accès SDMA sur puces AMD grand public
+  #     HSA_ENABLE_SDMA = "0";
+  #   };
+  #
+  #   # Persistance intégrale des données et stockages sur l'hôte NixOS
+  #   volumes = [
+  #     # Montage des modèles sur le chemin attendu par le conteneur
+  #     "/var/lib/comfyui/models:/root/ComfyUI/models"
+  #     # Persistance de la configuration utilisateur, des workflows et du cache ComfyUI-Manager
+  #     "/var/lib/comfyui/user:/root/ComfyUI/user"
+  #     # Persistance des nœuds personnalisés et extensions installées
+  #     "/var/lib/comfyui/custom_nodes:/root/ComfyUI/custom_nodes"
+  #     # Montage du dossier de sortie des images
+  #     "/var/lib/comfyui/output:/root/ComfyUI/output"
+  #   ];
+  #
+  #   # Accès direct aux périphériques matériels AMD (ROCm & DRI)
+  #   extraOptions = [
+  #     "--device=/dev/kfd"   # Kernel Fusion Driver (Pilote principal ROCm)
+  #     "--device=/dev/dri"   # Direct Rendering Infrastructure (Accélération graphique)
+  #     "--group-add=video"   # Attribution des privilèges du groupe vidéo hôte
+  #     "--ipc=host"          # Partage de mémoire IPC (évite les engorgements VRAM/RAM)
+  #     "--net=host"          # Alignement sur le réseau hôte pour accès direct
+  #   ];
+  # };
 
   # =======================================================================
   # ⚠️ NE PAS MODIFIER
