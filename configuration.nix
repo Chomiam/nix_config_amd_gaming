@@ -109,7 +109,7 @@
   # =======================================================================
   # 🌐 RÉSEAU & LOCALISATION
   # =======================================================================
-  networking = {
+  networking = {
     # Nom de la machine sur le réseau local
     hostName = "nixos";
 
