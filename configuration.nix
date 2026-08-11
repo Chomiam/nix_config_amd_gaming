@@ -83,13 +83,6 @@
       # Permet à NixOS d'écrire et mettre à jour les entrées de démarrage dans la NVRAM UEFI
       efi.canTouchEfiVariables = true;
 
-      # Thème visuel pour le menu GRUB (Module Flake grub2-themes)
-      grub2-theme = {
-        enable = true; # Active le thème personnalisé
-        theme = "tela"; # Utilise le thème "Tela"
-        footer = true; # Affiche la barre d'aide / raccourcis en bas de l'écran
-        customResolution = "2560x1440"; # Force la résolution native de l'écran (2.5K)
-      };
     };
   };
 
