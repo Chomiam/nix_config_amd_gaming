@@ -12,7 +12,7 @@
   # =========================================================================
   home.username = "chomiam";
   home.homeDirectory = "/home/chomiam";
-
+  home-manager.backupFileExtension = "backup";
   home.stateVersion = "26.05";
   programs.home-manager.enable = true;
 
