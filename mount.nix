@@ -1,9 +1,9 @@
 { config, pkgs, ... }:
 
 {
-  # Création automatique du dossier de montage s'il n'existe pas
+  # Règle 'z' pour modifier les permissions du point de montage une fois actif
   systemd.tmpfiles.rules = [
-    "d /mnt/Games 0775 chomiam users -"
+    "z /mnt/Games 0775 chomiam users -"
   ];
 
   # Configuration du montage BTRFS
@@ -12,8 +12,11 @@
     fsType = "btrfs";
     options = [
       "defaults"
-      "nofail" # Évite d'être bloqué au boot si le disque a un souci
-      "compress=zstd" # Option recommandée pour Btrfs (économise de l'espace sur les jeux)
+      "nofail"
+      "compress=zstd"
     ];
   };
+
+  # Forcer tmpfiles à s'exécuter après le montage de la partition
+  systemd.services.systemd-tmpfiles-setup.after = [ "mnt-Games.mount" ];
 }

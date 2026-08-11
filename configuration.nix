@@ -12,7 +12,6 @@
   # =======================================================================
   imports = [
     ./hardware-configuration.nix
-    # ./stylix.nix
     ./desktop.nix # Gestionnaire centralisé d'environnement de bureau
     ./mount.nix # Configuration du montage du disque de jeux
     ./neovim.nix
@@ -57,17 +56,14 @@
   # 🚀 BOOTLOADER & NOYAU (KERNEL)
   # =======================================================================
   boot = {
-    # Version du kernel (XanMod Latest)
-    kernelPackages = pkgs.linuxPackages_xanmod_latest;
+    # Version du kernel (XanMod)
+    kernelPackages = pkgs.linuxPackages_xanmod;
 
     # Arguments de démarrage du noyau AMD
-  kernelParams = [
-    "quiet"
-    "splash"
-    "amdgpu.ppfeaturemask=0xffffffff"
-    "amdgpu.dc=1" # Active le Display Core pour la gestion avancée des couleurs
-   
-  ];
+    kernelParams = [
+      "quiet"
+      "splash"  
+    ];
 
     # Écran de démarrage Plymouth
     plymouth.enable = true;
@@ -95,24 +91,10 @@
         customResolution = "2560x1440"; # Force la résolution native de l'écran (2.5K)
       };
     };
-
-    # Modules matériels personnalisés
-    extraModulePackages = with config.boot.kernelPackages; [
-      new-lg4ff # Logitech (G29, G920, G923...)
-      hid-tmff2 # Thrustmaster (T300, T150, TX...)
-      hid-fanatecff # Fanatec (CSL, DD1/DD2, GT DD Pro...)
-      zenpower # CPU AMD Ryzen Telemetry
-    ];
-    kernelModules = [ "zenpower" ];
-    blacklistedKernelModules = [ "k10temp" ]; # Évite tout conflit avec zenpower
   };
 
   # Optimisations mémoire & Kernel Sysctl (Optimisé Gaming / ZRAM)
-  zramSwap = {
-    enable = true;
-    algorithm = "zstd";
-    memoryPercent = 100;
-  };
+  zramSwap.enable = true;
 
   boot.kernel.sysctl = {
     "vm.max_map_count" = 2147483642; # Limite requise par SteamOS / Proton
@@ -127,7 +109,7 @@
   # =======================================================================
   # 🌐 RÉSEAU & LOCALISATION
   # =======================================================================
-  networking = {
+  networking = {
     # Nom de la machine sur le réseau local
     hostName = "nixos";
 
@@ -185,7 +167,6 @@
   services.printing.enable = true;
 
   hardware.enableAllFirmware = true;
-  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -205,8 +186,8 @@
       "wheel"
       "docker"
       "video"
-      "render" # Accès direct au GPU AMD pour ROCm / Ollama / ComfyUI
     ];
+
     shell = pkgs.fish;
 
     packages = with pkgs; [
@@ -217,26 +198,21 @@
       eden # Émulateur Nintendo Switch axé sur les hacks mod haute performance
       ludusavi # Outil de sauvegarde automatique des sauvegardes (savegames) de jeux PC
       protonplus # Interface graphique pour télécharger/gérer GE-Proton, Wine-GE et DXVK facilement
-      protontricks # Utilitaire pour installer des dépendances Windows dans les préfixes Proton
+      protontricks # Utilitaire pour installer des dépendances Windows dans les préprefixes Proton
       mangohud # Overlay en jeu affichant FPS, températures CPU/GPU, utilisation RAM et VRAM
       goverlay # Interface graphique pour configurer MangoHud, vkBasalt et ReplaySorcery
       stremio-linux-shell # Interface Shell/Linux pour le lecteur multimédia et de streaming Stremio
-      kodi # Centre multimédia complet pour la gestion de vos médias
       vlc # Lecteur média universel et léger pour tous formats
       easyeffects # Effets audio pour les applications Linux
       mpv # Moteur de rendu multimédia
-      inputs.yt-x.packages.${pkgs.stdenv.hostPlatform.system}.default
-
+ 
       # 💼 Productivité & Bureautique
       google-chrome # Navigateur web Google Chrome
       discord # Client de messagerie et de communication en temps réel
       onlyoffice-desktopeditors # Suite bureautique complète (compatible MS Office)
-      davinci-resolve # Logiciel de montage vidéo professionnel
-      godot # Éditeur de jeux 2D/3D
       thunderbird # Client de messagerie électronique, calendrier et gestionnaire de contacts
       popsicle # Outil simple d'écriture d'images ISO sur plusieurs clés USB en parallèle
       bazaar # Boutique/catalogue d'applications alternatives pour Linux
-      zed-editor # Éditeur de code ultra-rapide et moderne écrit en Rust
       nil # Language Server (LSP) pour le langage Nix
 
       # 🛠️ Outils CLI & Shell
@@ -261,46 +237,6 @@
     interactiveShellInit = "set fish_greeting";
   };
 
-#   # =======================================================================
-#   # 🤖 INTELLIGENCE ARTIFICIELLE & RECHERCHE LOCAL
-#   # =======================================================================
-# :  # Ollama exécuté sur le GPU AMD RX 9070 XT via ROCm (RDNA 4)
-#   services.ollama = {
-#     enable = true;
-#     package = pkgs.ollama-rocm;
-#     rocmOverrideGfx = "12.0.1";
-#     environmentVariables = {
-#       HSA_OVERRIDE_GFX_VERSION = "12.0.1";
-#       # Libère la VRAM instantanément après chaque génération de prompt
-#       OLLAMA_KEEP_ALIVE = "0s";
-#     };
-#   };
-#
-#   # SearXNG : Moteur de recherche privé (Sert d'outil d'accès web à l'agent)
-#   services.searx = {
-#     enable = true;
-#     settings = {
-#       server = {
-#         port = 8888;
-#         bind_address = "127.0.0.1";
-#         secret_key = "secret_key_chomiam_local_ia";
-#       };
-#       search = {
-#         safe_search = 0;
-#         formats = [ "html" "json" ]; # Le format JSON est nécessaire pour l'extraction via Open-WebUI
-#       };
-#     };
-#   };
-#
-#   # Interface Open-WebUI (Agent d'interaction avec le modèle + Web Search)
-#   services.open-webui = {
-#     enable = true;
-#     port = 8080;
-#     environment = {
-#       OLLAMA_BASE_URL = "http://127.0.0.1:11434";
-#     };
-#   };
-
   # =======================================================================
   # 🎮 PERFORMANCES GAMING & GRAPHISMES
   # =======================================================================
@@ -320,7 +256,6 @@
       vkbasalt # Injecte la couche Vulkan vkBasalt pour le post-traitement (filtres visuels / ReShade)
       libva # Support de l'accélération matérielle (décodage/encodage vidéo VA-API)
       mesa.opencl # Fournit le runtime OpenCL (via Rusticl/Mesa) pour DaVinci Resolve
-      rocmPackages.clr # Runtimes ROCm pour le calcul GPU AMD
     ];
   };
 
@@ -351,24 +286,6 @@
     capSysNice = false; # Désactive l'attribution de capacité SUID (géré via Gamemode/renice)
   };
 
-  # Démon de priorités processus CachyOS (Ananicy)
-  services.ananicy = {
-    enable = true;
-    package = pkgs.ananicy-cpp;
-    rulesProvider = pkgs.ananicy-rules-cachyos;
-  };
-
-  # Service de démarrage pour l'ordonnanceur personnalisé sched_ext (LAVD)
-  systemd.services.scx = {
-    description = "sched_ext LAVD scheduler";
-    wantedBy = [ "multi-user.target" ];
-
-    serviceConfig = {
-      ExecStart = "${pkgs.scx.full}/bin/scx_lavd";
-      Restart = "always";
-    };
-  };
-
   # =======================================================================
   # 📦 PAQUETS SYSTÈME (environment.systemPackages)
   # =======================================================================
@@ -379,9 +296,6 @@
     winetricks # Assistant pour installer des DLL et composants Windows manquants
     protontricks # Assistant pour gérer les composants dans les préprefixes Proton
     steam-run # Exécute des binaires Linux standards non prévus pour NixOS
-    vkbasalt # Couche de post-traitement Vulkan (filtres visuels/ReShade en jeu)
-    low-latency-layer # Couche Vulkan pour réduire la latence
-    innoextract # Extrait le contenu des installeurs Windows Inno Setup
 
     # 🖥️ Interface & Rendu
     adw-gtk3 # Thème pour uniformiser le style des anciennes apps GTK3 avec Libadwaita
@@ -391,7 +305,6 @@
     svp # Interpolation vidéo en temps réel vers 60/144Hz
 
     # 📦 Compression & Archives
-    atool # Interface universelle pour gérer tout type d'archive
     gnutar # Outil d'archivage standard (commande tar)
     libarchive # Bibliothèque multi-format d'extraction/compression (bsdtar)
     p7zip # Utilitaire pour la gestion des fichiers compressés .7z
@@ -405,7 +318,6 @@
 
     # 🛠️ Outils Système
     nh # CLI d'aide pour la gestion des Flakes NixOS
-    scx.full # Ordonnanceurs CPU sched_ext (comprend scx_lavd)
     fuse3 # Système de fichiers FUSE v3 (indispensable pour les AppImages)
     python3 # Interpréteur Python 3
     curl # Transfert de données en ligne de commande
@@ -414,11 +326,6 @@
     libxcb # Support GUI pour AppImages/Tkinter
     killall # Utilitaire d'arrêt de processus par nom
 
-    # 🔊 Outils ALSA (CLI)
-    alsa-utils # Outils d'administration audio CLI (alsamixer, amixer, etc.)
-    alsa-tools # Outils avancés pour cartes audio matérielles
-    alsa-firmware # Firmwares propriétaires pour puces audio
-    alsa-lib # Bibliothèque C bas niveau pour l'API ALSA
   ];
 
   # =======================================================================
@@ -477,61 +384,11 @@
     ];
   };
 
-# ===========================================================================
+  # ===========================================================================
   # 🐳 Virtualisation & Moteur Docker
   # ===========================================================================
   virtualisation.docker.enable = true;
   virtualisation.oci-containers.backend = "docker";
-
-
-
-  # ===========================================================================
-  # 🎨 Conteneur ComfyUI (Image Communautaire Stable ROCm)
-  # ===========================================================================
-  # virtualisation.oci-containers.containers.comfyui = {
-  #   # Image communautaire de référence (PyTorch ROCm stable, pas de version Alpha)
-  #   image = "yanwk/comfyui-boot:rocm";
-  #
-  #   # Exposition de l'interface Web
-  #   ports = [ "8188:8188" ];
-  #
-  #   # NOTE : On n'utilise pas 'cmd = [...]' car le point d'entrée de ce conteneur
-  #   # exécute son propre script qui intercepte la variable CLI_ARGS.
-  #   environment = {
-  #     # Drapeaux d'exécution transmis directement au serveur ComfyUI
-  #     CLI_ARGS = "--listen 0.0.0.0 --port 8188 --lowvram";
-  #
-  #     # Anti-fragmentation de la mémoire VRAM par PyTorch
-  #     PYTORCH_CUDA_ALLOC_CONF = "expandable_segments:True";
-  #
-  #     # Identification de l'architecture GPU (RDNA 4 / RX 9070 XT -> GFX 12.0.1)
-  #     HSA_OVERRIDE_GFX_VERSION = "12.0.1";
-  #
-  #     # Prévention des gels système dus aux accès SDMA sur puces AMD grand public
-  #     HSA_ENABLE_SDMA = "0";
-  #   };
-  #
-  #   # Persistance intégrale des données et stockages sur l'hôte NixOS
-  #   volumes = [
-  #     # Montage des modèles sur le chemin attendu par le conteneur
-  #     "/var/lib/comfyui/models:/root/ComfyUI/models"
-  #     # Persistance de la configuration utilisateur, des workflows et du cache ComfyUI-Manager
-  #     "/var/lib/comfyui/user:/root/ComfyUI/user"
-  #     # Persistance des nœuds personnalisés et extensions installées
-  #     "/var/lib/comfyui/custom_nodes:/root/ComfyUI/custom_nodes"
-  #     # Montage du dossier de sortie des images
-  #     "/var/lib/comfyui/output:/root/ComfyUI/output"
-  #   ];
-  #
-  #   # Accès direct aux périphériques matériels AMD (ROCm & DRI)
-  #   extraOptions = [
-  #     "--device=/dev/kfd"   # Kernel Fusion Driver (Pilote principal ROCm)
-  #     "--device=/dev/dri"   # Direct Rendering Infrastructure (Accélération graphique)
-  #     "--group-add=video"   # Attribution des privilèges du groupe vidéo hôte
-  #     "--ipc=host"          # Partage de mémoire IPC (évite les engorgements VRAM/RAM)
-  #     "--net=host"          # Alignement sur le réseau hôte pour accès direct
-  #   ];
-  # };
 
   # =======================================================================
   # ⚠️ NE PAS MODIFIER
