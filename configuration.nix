@@ -61,11 +61,13 @@
     kernelPackages = pkgs.linuxPackages_xanmod_latest;
 
     # Arguments de démarrage du noyau AMD
-    kernelParams = [
-      "quiet"
-      "splash"
-      "amdgpu.ppfeaturemask=0xffffffff"
-    ];
+  kernelParams = [
+    "quiet"
+    "splash"
+    "amdgpu.ppfeaturemask=0xffffffff"
+    "amdgpu.dc=1" # Active le Display Core pour la gestion avancée des couleurs
+   
+  ];
 
     # Écran de démarrage Plymouth
     plymouth.enable = true;
