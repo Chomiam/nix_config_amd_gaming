@@ -6,14 +6,15 @@
 }:
 
 {
-
   # =========================================================================
   # 👤 INFORMATIONS UTILISATEUR & SYSTÈME
   # =========================================================================
-  home.username = "chomiam";
-  home.homeDirectory = "/home/chomiam";
-  home-manager.backupFileExtension = "backup";
-  home.stateVersion = "26.05";
+  home = {
+    username = "chomiam";
+    homeDirectory = "/home/chomiam";
+    stateVersion = "26.05";
+  };
+
   programs.home-manager.enable = true;
 
   # =========================================================================
@@ -25,14 +26,14 @@
     accent = "lavender";
 
     alacritty.enable = true;
-    };
+  };
 
   # =========================================================================
-  # 🎨 THÈME GTK & ICÔNES
+  # 🎨 THÈME GTK, CURSEUR & ICÔNES
   # =========================================================================
   gtk = {
     enable = true;
-   
+
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
     };
@@ -56,15 +57,6 @@
     };
   };
 
-  # =========================================================================
-  # 📦 PAQUETS UTILISATEUR & POLICES
-  # =========================================================================
-  home.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
-  ];
-
-  services.easyeffects.enable = true;
-
   home.pointerCursor = {
     enable = true;
     name = "Adwaita";
@@ -75,7 +67,16 @@
   };
 
   # =========================================================================
-  # 💻 TERMINAL PRINCIPAL (ALACRITTY - CATPPUCCIN MOCHA)
+  # 📦 PAQUETS UTILISATEUR & SERVICES
+  # =========================================================================
+  home.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+  ];
+
+  services.easyeffects.enable = true;
+
+  # =========================================================================
+  # 💻 TERMINAL PRINCIPAL (ALACRITTY)
   # =========================================================================
   programs.alacritty = {
     enable = true;
@@ -106,6 +107,9 @@
     };
   };
 
+  # =========================================================================
+  # ⚙️ PARAMÈTRES GNOME / DCONF
+  # =========================================================================
   dconf.settings = {
     "org/gnome/desktop/default-applications/terminal" = {
       exec = "alacritty";
@@ -144,10 +148,10 @@
   };
 
   # =========================================================================
-  # 🌐 VARIABLES D'ENVIRONNEMENT UTILISATEUR
+  # 🌐 VARIABLES D'ENVIRONNEMENT & XDG
   # =========================================================================
   home.sessionVariables = {
-    "TERMINAL" = "alacritty";
+    TERMINAL = "alacritty";
   };
 
   xdg.configFile."fastfetch/config.jsonc".source =
