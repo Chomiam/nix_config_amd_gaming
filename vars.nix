@@ -1,0 +1,81 @@
+{
+  # =========================================================================
+  # ⚙️ VARIABLES CENTRALISÉES DU SYSTÈME ET DE L'UTILISATEUR
+  # =========================================================================
+
+  # Nom d'hôte de la machine (Hostname)
+  hostName = "chomiamos";
+
+  # Localisation & Fuseau horaire
+  timeZone = "Europe/Paris";
+  defaultLocale = "fr_FR.UTF-8";
+
+  # Version de l'état système NixOS / Home Manager
+  stateVersion = "26.05";
+
+  # Profil utilisateur principal
+  user = {
+    username = "chomiam";
+    fullName = "Axel Valens";
+    homeDirectory = "/home/chomiam";
+    shell = "fish";
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+      "video"
+    ];
+  };
+
+  # =========================================================================
+  # 🖥️ ENVIRONNEMENT DE BUREAU
+  # Options disponibles : "gnome" | "cosmic" | "both"
+  # =========================================================================
+  desktopEnv = "cosmic";
+
+  # =========================================================================
+  # 🎮 SELECTION MATÉRIELLE (GPU)
+  # Options disponibles : "amd" | "nvidia" | "nvidia-legacy" | "intel"
+  #
+  # - "amd"           : AMD Radeon (RADV Vulkan, ROCm OpenCL, Kernel XanMod Latest)
+  # - "nvidia"        : NVIDIA Moderne (GTX 1650 / RTX et plus récentes) (Drivers récents + Kernel XanMod Stable)
+  # - "nvidia-legacy" : NVIDIA Ancienne génération (< GTX 1650 : GTX 10xx, 9xx, etc.) (Pilotes legacy 470/390 + Kernel XanMod Stable)
+  # - "intel"         : Intel iGPU/dGPU (VAAPI intel-media-driver, Kernel XanMod Latest)
+  # =========================================================================
+  gpuDriver = "amd";
+
+  # Options du mode Gaming
+  gaming = {
+    enable = true;
+    mountGamesDisk = true;
+  };
+
+  # =========================================================================
+  # 🎬 LOGICIEL DE MONTAGE DAVINCI RESOLVE
+  # Options disponibles : "none" | "free" | "studio"
+  #
+  # - "none"   : Désactivé (Aucun paquet ni dépendance OpenCL/ROCm inutile installée)
+  # - "free"   : Version Gratuite (DaVinci Resolve) + Accélération GPU selon vars.gpuDriver
+  # - "studio" : Version Payante (DaVinci Resolve Studio) + Accélération GPU selon vars.gpuDriver
+  # =========================================================================
+  davinciResolve = "none";
+
+  # =========================================================================
+  # 🤖 SUITE IA LOCALE (OLLAMA + OPEN-WEBUI + SEARXNG)
+  # =========================================================================
+  aiSuite = {
+    # Active la suite complète Ollama + Open-WebUI + SearXNG (Désactivé par défaut)
+    enable = false;
+
+    # Override ROCm spécifique aux GPU AMD (ex: "12.0.1" pour RX 9070 XT RDNA4, "11.0.0" pour RX 7000 RDNA3, "10.3.0" pour RX 6000).
+    # NOTE : Cette variable est automatiquement ignorée si vars.gpuDriver est réglé sur "nvidia", "nvidia-legacy" ou "intel".
+    rocmOverrideGfx = "12.0.1";
+
+    # Libération instantanée de la VRAM (0s = déchargement immédiat du modèle après génération)
+    keepAlive = "0s";
+
+    # Ports des services locaux
+    openWebUiPort = 8080;
+    searxPort = 8888;
+  };
+}

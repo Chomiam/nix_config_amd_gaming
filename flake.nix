@@ -1,19 +1,19 @@
 {
-  description = "Configuration NixOS avec Flakes, Flatpak, Home Manager";
+  description = "Configuration NixOS Modulaire pour Gaming, Matériel (AMD/NVIDIA/Intel) et Home Manager";
 
   # ===========================================================================
   # 📦 INPUTS (SOURCES DES PAQUETS ET MODULES)
   # ===========================================================================
   inputs = {
-    # Nixpkgs branche stable
+    # Nixpkgs branche stable 26.05
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
 
-    # Dépôts tiers et modules système
+    # Support Déclaratif Flatpak
     nix-flatpak.url = "github:gmodena/nix-flatpak";
 
     # Thème Catppuccin
     catppuccin = {
-      url = "github:catppuccin/nix/release-26.05";
+      url = "github:catppuccin/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -22,45 +22,67 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-  };
 
-  # ===========================================================================
-  # ⚙️ OUTPUTS (ASSEMBLAGE DE LA CONFIGURATION NIXOS)
-  # ===========================================================================
-  outputs = { self, nixpkgs, ... }@inputs: {
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      # Transmet l'argument 'inputs' à configuration.nix et aux modules système
-      specialArgs = { inherit inputs; };
+    # Nixpkgs branche unstable (fournit COSMIC Desktop 1.5+ officiel)
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-      modules = [
-        # 🖥️ Architecture système
-        { nixpkgs.hostPlatform = "x86_64-linux"; }
-
-        # 🛠️ Fichier de configuration principal du système
-        ./configuration.nix
-
-        # 📦 Insertion des modules système tiers
-        inputs.nix-flatpak.nixosModules.nix-flatpak
-        inputs.home-manager.nixosModules.home-manager
-
-        # 🏠 Configuration spécifique de Home Manager
-        {
-          home-manager = {
-            useGlobalPkgs = true;
-            useUserPackages = true;
-
-            extraSpecialArgs = { inherit inputs; };
-
-            # 🛠️ Modules partagés pour tous les utilisateurs Home Manager
-            sharedModules = [
-              inputs.catppuccin.homeModules.catppuccin
-             ];
-
-            # 👤 Import du profil utilisateur
-            users.chomiam = import ./home.nix;
-          };
-        }
-      ];
+    # Dépôt d'applets communautaires pour COSMIC Desktop
+    ext-cosmic-applets = {
+      url = "github:wingej0/ext-cosmic-applets-flake";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
   };
+
+  # ===========================================================================
+  # ⚙️ OUTPUTS (ASSEMBLAGE MODULAIRE DE LA CONFIGURATION NIXOS)
+  # ===========================================================================
+  outputs = { self, nixpkgs, ... }@inputs:
+    let
+      # Chargement du fichier unique de variables utilisateur & hôte
+      vars = import ./vars.nix;
+
+      desktopSystem = nixpkgs.lib.nixosSystem {
+        # Transmet 'inputs' et 'vars' à tous les modules NixOS
+        specialArgs = { inherit inputs vars; };
+
+        modules = [
+          # 🖥️ Architecture système
+          { nixpkgs.hostPlatform = "x86_64-linux"; }
+
+          # 🛠️ Configuration de l'hôte principal (Desktop)
+          ./hosts/desktop/configuration.nix
+
+          # 📦 Insertion des modules système tiers
+          inputs.nix-flatpak.nixosModules.nix-flatpak
+          inputs.home-manager.nixosModules.home-manager
+
+          # 🏠 Configuration dynamique de Home Manager
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              backupFileExtension = "backup";
+
+              # Transmet 'inputs' et 'vars' à tous les modules Home-Manager
+              extraSpecialArgs = { inherit inputs vars; };
+
+              # 🛠️ Modules partagés Home Manager
+              sharedModules = [
+                inputs.catppuccin.homeModules.catppuccin
+              ];
+
+              # 👤 Chargement dynamique du profil utilisateur principal
+              users.${vars.user.username} = import ./home;
+            };
+          }
+        ];
+      };
+    in
+    {
+      nixosConfigurations = {
+        ${vars.hostName} = desktopSystem;
+        default = desktopSystem;
+        nixos = desktopSystem;
+      };
+    };
 }

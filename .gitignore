@@ -1,3 +1,12 @@
-secrets/
-hardware-configuration.nix
-hardware-configuration.nix
+# Secret files containing sensitive keys/tokens
+secrets/*
+!secrets/*.example
+
+# Nix build outputs
+result
+result-*
+
+# OS / Editor temporary files
+.DS_Store
+*.swp
+*.tmp

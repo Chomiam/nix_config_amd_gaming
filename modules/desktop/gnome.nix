@@ -1,29 +1,16 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
+{ pkgs, vars, ... }:
 
 {
-  # =======================================================================
-  # 🖥️ GESTIONNAIRE D'ENVIRONNEMENT DE BUREAU
-  # =======================================================================
+  # =========================================================================
+  # 🖥️ ENVIRONNEMENT DE BUREAU : GNOME SHELL
+  # =========================================================================
 
-  # -----------------------------------------------------------------------
-  # 🟢 1. GNOME
-  # -----------------------------------------------------------------------
-
-  # Active le serveur graphique X11
+  # Activation X11 & GDM & GNOME
   services.xserver.enable = true;
-
-  # Active le gestionnaire de connexion graphique GDM
   services.displayManager.gdm.enable = true;
-
-  # Active l'environnement de bureau GNOME Shell
   services.desktopManager.gnome.enable = true;
 
-  # Liste des applications GNOME par défaut à ne pas installer sur le système
+  # Exclusions d'applications GNOME indésirables
   environment.gnome.excludePackages = with pkgs; [
     totem
     gnome-maps
@@ -32,8 +19,8 @@
     epiphany
   ];
 
-  # Outils et extensions GNOME installés pour l'utilisateur "chomiam"
-  users.users."chomiam".packages = with pkgs; [
+  # Paquets GNOME & Extensions installés pour l'utilisateur principal
+  users.users."${vars.user.username}".packages = with pkgs; [
     gnome-tweaks
     gnome-extension-manager
     gnomeExtensions.dash-to-dock
@@ -44,7 +31,7 @@
     gnomeExtensions.arcmenu
   ];
 
-  # Activation système des extensions GNOME via dconf
+  # Activation au niveau dconf système des extensions GNOME
   programs.dconf.profiles.user.databases = [
     {
       settings = {
@@ -61,10 +48,9 @@
     }
   ];
 
-  # Configuration fine de la session GNOME via Home Manager
-  home-manager.users."chomiam" = {
+  # Parameters dconf spécifiques à l'utilisateur via Home-Manager
+  home-manager.users."${vars.user.username}" = {
     dconf.settings = {
-      # Applications favorites épinglées dans le dock/dash GNOME
       "org/gnome/shell" = {
         favorite-apps = [
           "Alacritty.desktop"
@@ -78,11 +64,9 @@
           "onlyoffice-desktopeditors.desktop"
           "thunderbird.desktop"
           "com.obsproject.Studio.desktop"
-          "zed-editor.desktop"
         ];
       };
 
-      # Options expérimentales du gestionnaire de fenêtres Mutter
       "org/gnome/mutter" = {
         experimental-features = [
           "scale-monitor-framebuffer"
@@ -91,12 +75,11 @@
         ];
       };
 
-      # Couleur d'accentuation de l'interface GNOME
       "org/gnome/desktop/interface" = {
         accent-color = "purple";
+        color-scheme = "prefer-dark";
       };
 
-      # Configuration personnalisée du dock (Dash to Dock)
       "org/gnome/shell/extensions/dash-to-dock" = {
         dock-position = "LEFT";
         dock-fixed = true;
