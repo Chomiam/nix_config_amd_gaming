@@ -10,5 +10,6 @@
      else if vars.gpuDriver == "nvidia-legacy" then ./nvidia-legacy.nix
      else if vars.gpuDriver == "intel" then ./intel.nix
      else ./amd.nix)
+    ./steering-wheels.nix
   ];
 }

@@ -51,6 +51,16 @@
   };
 
   # =========================================================================
+  # 🏎️ PRISE EN CHARGE DES VOLANTS & PERIPHERIQUES DE SIMRACING (OVERSTEER)
+  # Options disponibles : true | false
+  #
+  # - true  : Active les drivers noyau supplémentaires (new-lg4ff, hid-fanatecff,
+  #           hid-tmff2, hid-t150, universal-pidff), les règles udev et l'app Oversteer.
+  # - false : Désactivé (Aucun pilote ni logiciel supplémentaire chargé).
+  # =========================================================================
+  steeringWheelSupport = true;
+
+  # =========================================================================
   # 🎬 LOGICIEL DE MONTAGE DAVINCI RESOLVE
   # Options disponibles : "none" | "free" | "studio"
   #
